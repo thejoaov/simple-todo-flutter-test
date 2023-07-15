@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:simple_todo_flutter/todo_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({
+    super.key,
+  });
 
   @override
   LoginPageState createState() => LoginPageState();
