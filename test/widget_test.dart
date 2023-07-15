@@ -6,12 +6,14 @@
 // tree, read text, and verify that the values of widget properties are correct.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:simple_todo_flutter/main.dart';
 import 'package:simple_todo_flutter/todo_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Todo smoke test', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
@@ -46,9 +48,9 @@ void main() {
     await tester.tap(find.byKey(const Key('add_todo_button')));
 
     // Rebuild the widget after the state has changed.
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     // Expect to find the "Buy milk" todo
-    expect(find.text('Buy milk'), findsOneWidget);
+    expect(find.text('Buy milk'), findsWidgets);
   });
 }

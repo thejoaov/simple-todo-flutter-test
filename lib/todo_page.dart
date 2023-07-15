@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+late SharedPreferences prefs;
 
 class TodoPage extends StatefulWidget {
   const TodoPage({Key? key}) : super(key: key);
@@ -8,9 +13,44 @@ class TodoPage extends StatefulWidget {
 }
 
 class TodoPageState extends State<TodoPage> {
-  final List<String> todos = [];
+  late List<String> todos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((value) {
+      prefs = value;
+      setState(() {
+        todos =
+            List<String>.from(json.decode(prefs.getString("todos") ?? "[]"));
+      });
+    });
+  }
+
   final todoField = TextEditingController();
   String todo = '';
+
+  void addTodo(String todo) {
+    setState(() {
+      todos.add(todo);
+      todo = '';
+    });
+    prefs.setString(
+      'todos',
+      jsonEncode(todos),
+    );
+    todoField.clear();
+  }
+
+  void removeTodo(int index) {
+    setState(() {
+      todos.removeAt(index);
+      prefs.setString(
+        'todos',
+        todos.toString(),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +78,7 @@ class TodoPageState extends State<TodoPage> {
                     ),
                     onSubmitted: (value) {
                       if (todo.isEmpty) return;
-                      setState(() {
-                        todos.add(value);
-                        todoField.clear();
-                        todo = '';
-                      });
+                      addTodo(todo);
                     },
                   ),
                 ),
@@ -51,11 +87,7 @@ class TodoPageState extends State<TodoPage> {
                   icon: const Icon(Icons.add),
                   onPressed: () {
                     if (todo.isEmpty) return;
-                    setState(() {
-                      todos.add(todo);
-                      todoField.clear();
-                      todo = '';
-                    });
+                    addTodo(todo);
                   },
                 ),
               ],
@@ -69,9 +101,9 @@ class TodoPageState extends State<TodoPage> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
-                      setState(() {
-                        todos.removeAt(index);
-                      });
+                      removeTodo(
+                        index,
+                      );
                     },
                   ),
                 );
